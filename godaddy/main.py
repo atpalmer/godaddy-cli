@@ -25,12 +25,17 @@ class GodaddyAuth(requests.auth.AuthBase):
         return r
 
 
+class GodaddyDomains(object):
+    def available(self, domain):
+        response = requests.get('https://api.godaddy.com/v1/domains/available', params={ 'domain': domain }, auth=GodaddyAuth(GODADDY_KEY, GODADDY_SECRET))
+        return response
+
+
 def main():
-    response = requests.get('https://api.godaddy.com/v1/domains/available?domain=example.guru', auth=GodaddyAuth(GODADDY_KEY, GODADDY_SECRET))
-    #response = requests.get('https://api.godaddy.com/v1/certificates/cert1', auth=GodaddyAuth(GODADDY_KEY, GODADDY_SECRET))
+    godaddy = GodaddyDomains()
+    response = godaddy.available('example.guru')
     response.raise_for_status()
-    print(response.text)
-    #print(json.dumps(response.json(), indent=2))
+    print(json.dumps(response.json(), indent=2))
 
 
 if __name__ == '__main__':
