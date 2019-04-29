@@ -31,12 +31,20 @@ class GodaddyDomains(object):
         return response
 
 
+@click.group()
 def main():
+    pass
+
+
+@main.group()
+def domains():
+    pass
+
+
+@click.argument('domain')
+@domains.command()
+def available(domain):
     godaddy = GodaddyDomains()
-    response = godaddy.available('example.guru')
+    response = godaddy.available(domain)
     response.raise_for_status()
     print(json.dumps(response.json(), indent=2))
-
-
-if __name__ == '__main__':
-    main()
