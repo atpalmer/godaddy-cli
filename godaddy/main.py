@@ -77,6 +77,9 @@ class GodaddySubscriptions(object):
     def list(self, **kwargs):
         return self._requests.get('https://api.godaddy.com/v1/subscriptions', params=kwargs)
 
+    def products(self):
+        return self._requests.get('https://api.godaddy.com/v1/subscriptions/productGroups')
+
 
 def printjson(func):
     @functools.wraps(func)
@@ -162,3 +165,10 @@ def subscriptions(ctx):
 @printjson
 def list(godaddy, **kwargs):
     return godaddy.list(**kwargs)
+
+
+@subscriptions.command()
+@click.pass_obj
+@printjson
+def products(godaddy):
+    return godaddy.products()
