@@ -60,6 +60,10 @@ class GodaddyDomains(object):
         response = self._requests.get('https://api.godaddy.com/v1/domains/suggest', params={ 'query': query, **kwargs })
         return response
 
+    def tlds(self):
+        response = self._requests.get('https://api.godaddy.com/v1/domains/tlds')
+        return response
+
 
 def printjson(func):
     @functools.wraps(func)
@@ -103,3 +107,10 @@ def mine(godaddy):
 @printjson
 def suggest(godaddy, query, **kwargs):
     return godaddy.suggest(query, **kwargs)
+
+
+@domains.command()
+@click.pass_obj
+@printjson
+def tlds(godaddy):
+    return godaddy.tlds()
