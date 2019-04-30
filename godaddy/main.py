@@ -52,6 +52,10 @@ class GodaddyDomains(object):
         response = self._requests.get('https://api.godaddy.com/v1/domains')
         return response
 
+    def domain(self, domain):
+        response = self._requests.get(f'https://api.godaddy.com/v1/domains/{domain}')
+        return response
+
     def available(self, domain):
         response = self._requests.get('https://api.godaddy.com/v1/domains/available', params={ 'domain': domain })
         return response
@@ -89,6 +93,14 @@ def domains(ctx):
 @printjson
 def list(godaddy):
     return godaddy.list()
+
+
+@click.argument('domain')
+@domains.command()
+@click.pass_obj
+@printjson
+def domain(godaddy, domain):
+    return godaddy.domain(domain)
 
 
 @click.argument('domain')
