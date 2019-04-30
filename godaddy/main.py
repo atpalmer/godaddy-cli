@@ -101,6 +101,18 @@ def printjson(func):
     return wrapper
 
 
+def groupcommand(group):
+    def decorator(func):
+        @group.command()
+        @click.pass_obj
+        @printjson
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
 @click.group()
 def main():
     pass
@@ -112,17 +124,13 @@ def domains(ctx):
     ctx.obj = GodaddyDomains()
 
 
-@domains.command()
-@click.pass_obj
-@printjson
+@groupcommand(domains)
 def list(godaddy):
     return godaddy.list()
 
 
 @click.argument('domain')
-@domains.command()
-@click.pass_obj
-@printjson
+@groupcommand(domains)
 def domain(godaddy, domain):
     return godaddy.domain(domain)
 
@@ -132,17 +140,13 @@ def domain(godaddy, domain):
 @click.option('--name', required=True)
 @click.option('--limit')
 @click.option('--offset')
-@domains.command()
-@click.pass_obj
-@printjson
+@groupcommand(domains)
 def records(godaddy, domain, type, name, **kwargs):
     return godaddy.records(domain, type, name, **kwargs)
 
 
 @click.argument('domain')
-@domains.command()
-@click.pass_obj
-@printjson
+@groupcommand(domains)
 def available(godaddy, domain):
     return godaddy.available(domain)
 
@@ -150,16 +154,12 @@ def available(godaddy, domain):
 @click.argument('query')
 @click.option('--country')
 @click.option('--limit')
-@domains.command()
-@click.pass_obj
-@printjson
+@groupcommand(domains)
 def suggest(godaddy, query, **kwargs):
     return godaddy.suggest(query, **kwargs)
 
 
-@domains.command()
-@click.pass_obj
-@printjson
+@groupcommand(domains)
 def tlds(godaddy):
     return godaddy.tlds()
 
@@ -172,16 +172,12 @@ def subscriptions(ctx):
 
 @click.option('--limit')
 @click.option('--offset')
-@subscriptions.command()
-@click.pass_obj
-@printjson
+@groupcommand(subscriptions)
 def list(godaddy, **kwargs):
     return godaddy.list(**kwargs)
 
 
-@subscriptions.command()
-@click.pass_obj
-@printjson
+@groupcommand(subscriptions)
 def products(godaddy):
     return godaddy.products()
 
@@ -194,16 +190,12 @@ def orders(ctx):
 
 @click.option('--limit')
 @click.option('--offset')
-@orders.command()
-@click.pass_obj
-@printjson
+@groupcommand(orders)
 def list(godaddy, **kwargs):
     return godaddy.list(**kwargs)
 
 
 @click.argument('order-id')
-@orders.command()
-@click.pass_obj
-@printjson
+@groupcommand(orders)
 def order(godaddy, order_id):
     return godaddy.order(order_id)
