@@ -72,6 +72,12 @@ class GodaddyDomains(object):
         return self._requests.get('https://api.godaddy.com/v1/domains/tlds')
 
 
+@GodaddyApi
+class GodaddySubscriptions(object):
+    def list(self, **kwargs):
+        return self._requests.get('https://api.godaddy.com/v1/subscriptions', params=kwargs)
+
+
 def printjson(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -141,3 +147,18 @@ def suggest(godaddy, query, **kwargs):
 @printjson
 def tlds(godaddy):
     return godaddy.tlds()
+
+
+@main.group()
+@click.pass_context
+def subscriptions(ctx):
+    ctx.obj = GodaddySubscriptions()
+
+
+@click.option('--limit')
+@click.option('--offset')
+@subscriptions.command()
+@click.pass_obj
+@printjson
+def list(godaddy, **kwargs):
+    return godaddy.list(**kwargs)
