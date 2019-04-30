@@ -57,26 +57,35 @@ class GodaddyDomains(object):
         return response
 
 
+def printjson(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        print(json.dumps(result, indent=2))
+    return wrapper
+
+
 @click.group()
 def main():
     pass
 
 
 @main.group()
-def domains():
-    pass
+@click.pass_context
+def domains(ctx):
+    ctx.obj = GodaddyDomains()
 
 
 @click.argument('domain')
 @domains.command()
-def available(domain):
-    godaddy = GodaddyDomains()
-    response = godaddy.available(domain)
-    print(json.dumps(response, indent=2))
+@click.pass_obj
+@printjson
+def available(godaddy, domain):
+    return godaddy.available(domain)
 
 
 @domains.command()
-def mine():
-    godaddy = GodaddyDomains()
-    response = godaddy.mine()
-    print(json.dumps(response, indent=2))
+@click.pass_obj
+@printjson
+def mine(godaddy):
+    return godaddy.mine()
