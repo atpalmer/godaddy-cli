@@ -81,6 +81,15 @@ class GodaddySubscriptions(object):
         return self._requests.get('https://api.godaddy.com/v1/subscriptions/productGroups')
 
 
+@GodaddyApi
+class GodaddyOrders(object):
+    def list(self, **kwargs):
+        return self._requests.get('https://api.godaddy.com/v1/orders', params=kwargs)
+
+    def order(self, order_id):
+        return self._requests.get(f'https://api.godaddy.com/v1/orders/{order_id}')
+
+
 def printjson(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -172,3 +181,26 @@ def list(godaddy, **kwargs):
 @printjson
 def products(godaddy):
     return godaddy.products()
+
+
+@main.group()
+@click.pass_context
+def orders(ctx):
+    ctx.obj = GodaddyOrders()
+
+
+@click.option('--limit')
+@click.option('--offset')
+@orders.command()
+@click.pass_obj
+@printjson
+def list(godaddy, **kwargs):
+    return godaddy.list(**kwargs)
+
+
+@click.argument('order-id')
+@orders.command()
+@click.pass_obj
+@printjson
+def order(godaddy, order_id):
+    return godaddy.order(order_id)
