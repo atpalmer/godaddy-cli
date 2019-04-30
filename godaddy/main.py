@@ -48,7 +48,7 @@ class GodaddyDomains(object):
     def __init__(self):
         self._requests = JsonRequests(auth=GodaddyAuth(GODADDY_KEY, GODADDY_SECRET))
 
-    def mine(self):
+    def list(self):
         response = self._requests.get('https://api.godaddy.com/v1/domains')
         return response
 
@@ -84,19 +84,19 @@ def domains(ctx):
     ctx.obj = GodaddyDomains()
 
 
+@domains.command()
+@click.pass_obj
+@printjson
+def list(godaddy):
+    return godaddy.list()
+
+
 @click.argument('domain')
 @domains.command()
 @click.pass_obj
 @printjson
 def available(godaddy, domain):
     return godaddy.available(domain)
-
-
-@domains.command()
-@click.pass_obj
-@printjson
-def mine(godaddy):
-    return godaddy.mine()
 
 
 @click.argument('query')
