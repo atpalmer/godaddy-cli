@@ -54,28 +54,22 @@ def GodaddyApi(cls):
 @GodaddyApi
 class GodaddyDomains(object):
     def list(self):
-        response = self._requests.get('https://api.godaddy.com/v1/domains')
-        return response
+        return self._requests.get('https://api.godaddy.com/v1/domains')
 
     def domain(self, domain):
-        response = self._requests.get(f'https://api.godaddy.com/v1/domains/{domain}')
-        return response
+        return self._requests.get(f'https://api.godaddy.com/v1/domains/{domain}')
 
     def records(self, domain, type, name, **kwargs):
-        response = self._requests.get(f'https://api.godaddy.com/v1/domains/{domain}/records/{type}/{name}', params=kwargs)
-        return response
+        return self._requests.get(f'https://api.godaddy.com/v1/domains/{domain}/records/{type}/{name}', params=kwargs)
 
     def available(self, domain):
-        response = self._requests.get('https://api.godaddy.com/v1/domains/available', params={ 'domain': domain })
-        return response
+        return self._requests.get('https://api.godaddy.com/v1/domains/available', params={ 'domain': domain })
 
     def suggest(self, query, **kwargs):
-        response = self._requests.get('https://api.godaddy.com/v1/domains/suggest', params={ 'query': query, **kwargs })
-        return response
+        return self._requests.get('https://api.godaddy.com/v1/domains/suggest', params={ 'query': query, **kwargs })
 
     def tlds(self):
-        response = self._requests.get('https://api.godaddy.com/v1/domains/tlds')
-        return response
+        return self._requests.get('https://api.godaddy.com/v1/domains/tlds')
 
 
 def printjson(func):
