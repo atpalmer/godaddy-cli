@@ -56,6 +56,10 @@ class GodaddyDomains(object):
         response = self._requests.get('https://api.godaddy.com/v1/domains/available', params={ 'domain': domain })
         return response
 
+    def suggest(self, query, **kwargs):
+        response = self._requests.get('https://api.godaddy.com/v1/domains/suggest', params={ 'query': query, **kwargs })
+        return response
+
 
 def printjson(func):
     @functools.wraps(func)
@@ -89,3 +93,13 @@ def available(godaddy, domain):
 @printjson
 def mine(godaddy):
     return godaddy.mine()
+
+
+@click.argument('query')
+@click.option('--country')
+@click.option('--limit')
+@domains.command()
+@click.pass_obj
+@printjson
+def suggest(godaddy, query, **kwargs):
+    return godaddy.suggest(query, **kwargs)
