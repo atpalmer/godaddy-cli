@@ -41,7 +41,7 @@ class GodaddyAuth(requests.auth.AuthBase):
 def GodaddyApi(**kwargs):
     def decorator(cls):
         def __init__(self):
-            self._requests = JsonRequests(auth=GodaddyAuth(GODADDY_KEY, GODADDY_SECRET))
+            self.http = JsonRequests(auth=GodaddyAuth(GODADDY_KEY, GODADDY_SECRET))
             self.__dict__.update(kwargs)
         cls.__init__ = __init__
         return cls
