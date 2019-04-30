@@ -44,10 +44,15 @@ class GodaddyAuth(requests.auth.AuthBase):
         return r
 
 
-class GodaddyDomains(object):
-    def __init__(self):
+def GodaddyApi(cls):
+    def init(self):
         self._requests = JsonRequests(auth=GodaddyAuth(GODADDY_KEY, GODADDY_SECRET))
+    cls.__init__ = init
+    return cls
 
+
+@GodaddyApi
+class GodaddyDomains(object):
     def list(self):
         response = self._requests.get('https://api.godaddy.com/v1/domains')
         return response
