@@ -44,50 +44,53 @@ class GodaddyAuth(requests.auth.AuthBase):
         return r
 
 
-def GodaddyApi(cls):
-    def init(self):
-        self._requests = JsonRequests(auth=GodaddyAuth(GODADDY_KEY, GODADDY_SECRET))
-    cls.__init__ = init
-    return cls
+def GodaddyApi(**kwargs):
+    def decorator(cls):
+        def __init__(self):
+            self._requests = JsonRequests(auth=GodaddyAuth(GODADDY_KEY, GODADDY_SECRET))
+            self.__dict__.update(kwargs)
+        cls.__init__ = __init__
+        return cls
+    return decorator
 
 
-@GodaddyApi
+@GodaddyApi(_base='https://api.godaddy.com/v1/domains')
 class GodaddyDomains(object):
     def list(self):
-        return self._requests.get('https://api.godaddy.com/v1/domains')
+        return self._requests.get(f'{self._base}')
 
     def domain(self, domain):
-        return self._requests.get(f'https://api.godaddy.com/v1/domains/{domain}')
+        return self._requests.get(f'{self._base}/{domain}')
 
     def records(self, domain, type, name, **kwargs):
-        return self._requests.get(f'https://api.godaddy.com/v1/domains/{domain}/records/{type}/{name}', params=kwargs)
+        return self._requests.get(f'{self._base}/{domain}/records/{type}/{name}', params=kwargs)
 
     def available(self, domain):
-        return self._requests.get('https://api.godaddy.com/v1/domains/available', params={ 'domain': domain })
+        return self._requests.get(f'{self._base}/available', params={ 'domain': domain })
 
     def suggest(self, query, **kwargs):
-        return self._requests.get('https://api.godaddy.com/v1/domains/suggest', params={ 'query': query, **kwargs })
+        return self._requests.get(f'{self._base}/suggest', params={ 'query': query, **kwargs })
 
     def tlds(self):
-        return self._requests.get('https://api.godaddy.com/v1/domains/tlds')
+        return self._requests.get(f'{self._base}/tlds')
 
 
-@GodaddyApi
+@GodaddyApi(_base='https://api.godaddy.com/v1/subscriptions')
 class GodaddySubscriptions(object):
     def list(self, **kwargs):
-        return self._requests.get('https://api.godaddy.com/v1/subscriptions', params=kwargs)
+        return self._requests.get(f'{self._base}', params=kwargs)
 
     def products(self):
-        return self._requests.get('https://api.godaddy.com/v1/subscriptions/productGroups')
+        return self._requests.get(f'{self._base}/productGroups')
 
 
-@GodaddyApi
+@GodaddyApi(_base='https://api.godaddy.com/v1/orders')
 class GodaddyOrders(object):
     def list(self, **kwargs):
-        return self._requests.get('https://api.godaddy.com/v1/orders', params=kwargs)
+        return self._requests.get(f'{self._base}', params=kwargs)
 
     def order(self, order_id):
-        return self._requests.get(f'https://api.godaddy.com/v1/orders/{order_id}')
+        return self._requests.get(f'{self._base}/{order_id}')
 
 
 def printjson(func):
