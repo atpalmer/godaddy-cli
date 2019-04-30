@@ -1,3 +1,4 @@
+import functools
 import json
 import os
 import requests
@@ -10,6 +11,24 @@ load_dotenv()
 
 GODADDY_KEY = os.getenv('GODADDY_KEY')
 GODADDY_SECRET = os.getenv('GODADDY_SECRET')
+
+
+class JsonRequests(object):
+    def __init__(self, **kwargs):
+        self._kwargs = kwargs
+
+    def __getattr__(self, attr_name):
+        attr = getattr(requests, attr_name)
+        if not callable(attr):
+            return attr
+        @functools.wraps(attr)
+        def attrwrapper(*args, **kwargs):
+            result = attr(*args, **{ **self._kwargs, **kwargs })
+            if not isinstance(result, requests.models.Response):
+                return result
+            result.raise_for_status()
+            return result.json()
+        return attrwrapper
 
 
 class GodaddyAuth(requests.auth.AuthBase):
@@ -26,8 +45,15 @@ class GodaddyAuth(requests.auth.AuthBase):
 
 
 class GodaddyDomains(object):
+    def __init__(self):
+        self._requests = JsonRequests(auth=GodaddyAuth(GODADDY_KEY, GODADDY_SECRET))
+
+    def mine(self):
+        response = self._requests.get('https://api.godaddy.com/v1/domains')
+        return response
+
     def available(self, domain):
-        response = requests.get('https://api.godaddy.com/v1/domains/available', params={ 'domain': domain }, auth=GodaddyAuth(GODADDY_KEY, GODADDY_SECRET))
+        response = self._requests.get('https://api.godaddy.com/v1/domains/available', params={ 'domain': domain })
         return response
 
 
@@ -46,5 +72,11 @@ def domains():
 def available(domain):
     godaddy = GodaddyDomains()
     response = godaddy.available(domain)
-    response.raise_for_status()
-    print(json.dumps(response.json(), indent=2))
+    print(json.dumps(response, indent=2))
+
+
+@domains.command()
+def mine():
+    godaddy = GodaddyDomains()
+    response = godaddy.mine()
+    print(json.dumps(response, indent=2))
